@@ -1,11 +1,9 @@
 @page "/"
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
-@using BlazingPizza.Services
 @inject OrderState OrderState
 
 <div class="main">
-    <h1>Blazing Pizzas</h1>
     <ul class="pizza-cards">
         @if (specials != null)
         {
@@ -39,11 +37,11 @@
             @foreach (var configuredPizza in order.Pizzas)
             {
                 <div class="cart-item">
+                    <a @onclick="@(() => OrderState.RemoveConfiguredPizza(configuredPizza))" class="delete-item">x</a>
                     <div class="title">@(configuredPizza.Size)" @configuredPizza.Special.Name</div>
                     <div class="item-price">
                         @configuredPizza.GetFormattedTotalPrice()
                     </div>
-                    <a @onclick="@(() => OrderState.RemoveConfiguredPizza(configuredPizza))" class="delete-item">x</a>
                 </div>
             }
         </div>
@@ -64,13 +62,12 @@
 </div>
 
 @code {
-    List<PizzaSpecial> specials = new();
-
+    List<PizzaSpecial> specials = new List<PizzaSpecial>();
     Order order => OrderState.Order;
 
     protected override async Task OnInitializedAsync()
     {
         specials = await HttpClient.GetFromJsonAsync<List<PizzaSpecial>>(NavigationManager.BaseUri + "specials");
     }
-
 }
+		
